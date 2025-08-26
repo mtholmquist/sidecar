@@ -1,0 +1,44 @@
+# Python / venv
+.venv/
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Env & local config
+.env
+.env.*
+.envrc
+
+# Logs / artifacts (just in case you generate any in-repo)
+*.log
+*.sqlite
+*.db
+*.out
+
+# Build
+dist/
+build/
+*.egg-info/
+.vscode/
+.idea/
+node_modules/
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# K3y5
+*.key
+*.p12
+*.pfx
+*.crt
+*.der
+*.keystore
+*.cer
+# scan artifacts
+reports/
+!reports/.gitkeep
+*.sarif
+*.report.json
+*.scan.json

@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sidecar"
+version = "0.2.2"
+description = "Sidecar: decoupled AI copilot for pentesting/CTFs"
+requires-python = ">=3.11"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "sidecar", email = "noreply@example.com" }]
+
+dependencies = [
+  "pydantic>=2.7",
+  "pyyaml>=6.0",
+  "rich>=13.7",
+  "beautifulsoup4>=4.12",
+  "lxml>=5.2",
+  "tqdm>=4.66",
+  "requests>=2.32",
+  "orjson>=3.10",
+  "textual>=0.76",
+  "openai>=1.40",
+  "anthropic>=0.37",
+]
+
+[project.scripts]
+sidecar = "sidecar.cli:main"
+
+[tool.setuptools]
+# We are using a flat layout; package code lives in ./sidecar
+package-dir = { "" = "." }
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["sidecar*"]
+exclude = ["samples*", "notes*"]
