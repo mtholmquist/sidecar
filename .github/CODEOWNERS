@@ -1,0 +1,4 @@
+# Require review from @mtholmquist on critical paths
+/.github/          @mtholmquist
+/src/              @mtholmquist
+/docs/             @mtholmquist
