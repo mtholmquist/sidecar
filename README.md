@@ -106,6 +106,24 @@ export AIC_OPENAI_MODEL=gpt-5-nano    # or gpt-4o-mini, etc.
 
 ---
 
+### Default Tmux Pane Layout
+Default tmux pane layout includes a main shell, sidecar agent logs, and sidecar UI with recommendations/notes.
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/6173c36d-fd6d-4576-9f65-235b0eff2df5"
+       alt="Sidecar tmux layout — full view"
+       width="900">
+</p>
+
+<p align="center">
+  
+| ![Pane 1](https://github.com/user-attachments/assets/1467e051-a31f-4ac5-8869-8339c4e9ce52) | ![Pane 2](https://github.com/user-attachments/assets/c2f0cdda-736b-4407-8265-4200e9c3ed9d) | ![Pane 3](https://github.com/user-attachments/assets/15f4d7c9-02b4-4967-965c-da77322acaec) |
+|:--:|:--:|:--:|
+| **Pane 1 — Sidecar Terminal (shell)** | **Pane 2 — Sidecar Agent (Logs)** | **Pane 3 — Sidecar UI (Notes)** |
+
+</p>
+
+---
+
 ## Using the `sc` wrapper (capture stdout/stderr)
 
 Some tools don’t write structured files—`sc` fixes that.
