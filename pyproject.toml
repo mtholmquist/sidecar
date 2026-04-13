@@ -14,7 +14,7 @@ authors = [{ name = "sidecar", email = "noreply@example.com" }]
 dependencies = [
   "pydantic>=2.7",
   "pyyaml>=6.0",
-  "rich>=13.7",
+  "rich>=15.0.0",
   "beautifulsoup4>=4.12",
   "lxml>=5.2",
   "tqdm>=4.67.3",
