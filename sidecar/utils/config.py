@@ -1,4 +1,7 @@
-import os, yaml, pathlib
+import os
+import pathlib
+
+import yaml
 
 DEFAULT_CFG = {
     "profiles": {

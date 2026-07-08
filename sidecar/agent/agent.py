@@ -60,7 +60,7 @@ def _recent_events(session_path: str, limit: int = 20) -> List[dict]:
     try:
         with open(session_path, "r", encoding="utf-8", errors="ignore") as f:
             lines = f.readlines()[-limit:]
-        return [json.loads(l) for l in lines if l.strip().startswith("{")]
+        return [json.loads(line) for line in lines if line.strip().startswith("{")]
     except Exception:
         return []
 
@@ -72,9 +72,21 @@ def _coerce_plan(obj: Any) -> Dict[str, Any]:
     """
     plan: Dict[str, Any] = {"next_actions": [], "notes": [], "escalation_paths": []}
     if isinstance(obj, dict):
-        plan["next_actions"] = list(obj.get("next_actions", [])) or []
-        plan["notes"] = list(obj.get("notes", [])) or []
-        plan["escalation_paths"] = list(obj.get("escalation_paths", [])) or []
+        next_actions = obj.get("next_actions", [])
+        if isinstance(next_actions, list):
+            plan["next_actions"] = [a for a in next_actions if isinstance(a, dict)]
+
+        notes = obj.get("notes", [])
+        if isinstance(notes, list):
+            plan["notes"] = [str(n) for n in notes if n]
+        elif isinstance(notes, str) and notes.strip():
+            plan["notes"] = [notes.strip()]
+
+        escalation_paths = obj.get("escalation_paths", [])
+        if isinstance(escalation_paths, list):
+            plan["escalation_paths"] = [str(p) for p in escalation_paths if p]
+        elif isinstance(escalation_paths, str) and escalation_paths.strip():
+            plan["escalation_paths"] = [escalation_paths.strip()]
         return plan
     if isinstance(obj, str) and obj.strip():
         plan["notes"] = [obj.strip()]

@@ -80,9 +80,12 @@ def up_main(provider=None, profile=None, session="sidecar", audit=None):
     agent_id = _sh_out("tmux", "display-message", "-p", "#{pane_id}")  # new pane is selected
 
     # 8) Name panes (so the status line shows them clearly)
-    _sh("tmux", "select-pane", "-t", pentest_id); _sh("tmux", "select-pane", "-T", "pentest-shell")
-    _sh("tmux", "select-pane", "-t", agent_id);   _sh("tmux", "select-pane", "-T", "agent")
-    _sh("tmux", "select-pane", "-t", ui_id);      _sh("tmux", "select-pane", "-T", "ui")
+    _sh("tmux", "select-pane", "-t", pentest_id)
+    _sh("tmux", "select-pane", "-T", "pentest-shell")
+    _sh("tmux", "select-pane", "-t", agent_id)
+    _sh("tmux", "select-pane", "-T", "agent")
+    _sh("tmux", "select-pane", "-t", ui_id)
+    _sh("tmux", "select-pane", "-T", "ui")
 
     # 9) Launch UI (bottom)
     _sh("tmux", "send-keys", "-t", ui_id, f"{py} -m sidecar ui --audit {audit}", "Enter")

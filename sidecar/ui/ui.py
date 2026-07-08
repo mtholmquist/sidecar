@@ -80,7 +80,7 @@ class SidecarUI(App):
         lines: list[str] = []
         lines.append(f"[b]last:[/b] {last_cmd if last_cmd else '—'}")
         if notes:
-            lines.append(f"[b]notes:[/b] " + " ".join(notes))
+            lines.append("[b]notes:[/b] " + " ".join(notes))
 
         lines.append("")
         lines.append("[b]suggestions[/b]")

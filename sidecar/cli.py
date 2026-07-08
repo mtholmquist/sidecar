@@ -48,7 +48,7 @@ def main() -> int:
     ri = rsub.add_parser("ingest", help="ingest HTML knowledge base")
     ri.add_argument("path")
 
-    up = sub.add_parser("up", help="launch tmux layout with agent (background) + UI + shell")
+    sub.add_parser("up", help="launch tmux layout with agent (background) + UI + shell")
 
     args = p.parse_args()
 

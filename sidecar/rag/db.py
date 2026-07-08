@@ -1,4 +1,7 @@
-import os, sqlite3, pathlib, pickle
+import os
+import pathlib
+import pickle
+import sqlite3
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
@@ -14,11 +17,13 @@ class SimpleIndex:
         cur = self._conn.cursor()
         cur.execute("DELETE FROM docs")
         cur.executemany("INSERT INTO docs (title,text,tags) VALUES (?,?,?)", docs)
-        self._conn.commit(); self._rebuild_tfidf()
+        self._conn.commit()
+        self._rebuild_tfidf()
     def _rebuild_tfidf(self):
         cur = self._conn.cursor()
         rows = list(cur.execute("SELECT id, text FROM docs ORDER BY id"))
-        ids = [r[0] for r in rows]; texts = [r[1] for r in rows] or [""]
+        ids = [r[0] for r in rows]
+        texts = [r[1] for r in rows] or [""]
         vec = TfidfVectorizer(max_features=20000).fit(texts)
         mat = vec.transform(texts)
         for k,v in (("tfidf_vec",vec),("tfidf_mat",mat),("tfidf_ids",ids)):
@@ -27,7 +32,8 @@ class SimpleIndex:
     def query(self, q: str, k: int = 4):
         cur = self._conn.cursor()
         rows = list(cur.execute("SELECT id,title,text,tags FROM docs ORDER BY id"))
-        if not rows: return []
+        if not rows:
+            return []
         vec = pickle.loads(cur.execute("SELECT v FROM meta WHERE k='tfidf_vec'").fetchone()[0])
         mat = pickle.loads(cur.execute("SELECT v FROM meta WHERE k='tfidf_mat'").fetchone()[0])
         qv = vec.transform([q])

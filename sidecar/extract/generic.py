@@ -1,4 +1,4 @@
-import os, re
+import re
 from typing import Dict, Any, List
 
 # generic, semantic extractors (no tool names)
@@ -9,11 +9,15 @@ RE_DOM   = re.compile(r'\b(?:(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,
 RE_EMAIL = re.compile(r'\b[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,63}\b', re.I)
 RE_CVE   = re.compile(r'\bCVE-\d{4}-\d{4,7}\b', re.I)
 
-RE_PORT_LINE = re.compile(r'\b(?:port|open|listening|closed|filtered)[^\n]{0,50}\b(\d{1,5})\b', re.I)
+RE_PORT_PATTERNS = [
+    re.compile(r'\bport\s+(\d{1,5})\b', re.I),
+    re.compile(r'\b(\d{1,5})/(?:tcp|udp)\b', re.I),
+    re.compile(r'\b(?:open|listening|closed|filtered)\s+(?:port\s+)?(\d{1,5})\b', re.I),
+]
 RE_SERVICE   = re.compile(r'\b(ssh|rdp|ftp|smtp|imap|pop3|http|https|smb|ldap|kerberos|dns|mysql|mssql|postgres|ntp|snmp|telnet)\b', re.I)
 
 RE_USERPASS  = re.compile(r'\b(user(name)?|login)[\s:=]+([^\s:]+)\b.*?\b(pass(word)?)[\s:=]+([^\s]+)\b', re.I)
-RE_PAIR      = re.compile(r'\b([A-Za-z0-9._\-]{1,64})[:|/]([^\s]{1,128})\b')  # loose: user:pass or user/pass
+RE_PAIR      = re.compile(r'\b([A-Za-z0-9._\-]{1,64})([:|/])([^\s]{1,128})\b')  # loose: user:pass or user/pass
 RE_FILEPATH  = re.compile(r'\b(/[^ \t\n\r\f\v]+|[A-Za-z]:\\[^ \t\n\r\f\v]+)\b')
 RE_BANNER    = re.compile(r'\b(Server:|X-Powered-By:|ssh-[0-9.]+|OpenSSH[_/][0-9.]+|nginx/[0-9.]+|Apache/[0-9.]+)\b.*', re.I)
 RE_ERROR     = re.compile(r'\b(denied|forbidden|unauthorized|timeout|timed out|refused|connection reset|no route|not found|exception|traceback|stack trace)\b', re.I)
@@ -32,7 +36,8 @@ def _extend_unique(a: List, b: List):
     seen = set(a)
     for x in b:
         if x not in seen:
-            a.append(x); seen.add(x)
+            a.append(x)
+            seen.add(x)
 
 def merge_facts(base: Dict[str, Any], incoming: Dict[str, Any]) -> Dict[str, Any]:
     if not base:
@@ -64,7 +69,13 @@ def extract_from_text(text: str) -> Dict[str, Any]:
     emails = RE_EMAIL.findall(text)
     cves = RE_CVE.findall(text)
 
-    ports = [int(p) for p in RE_PORT_LINE.findall(text) if p.isdigit()]
+    ports = []
+    for pat in RE_PORT_PATTERNS:
+        for p in pat.findall(text):
+            if p.isdigit():
+                n = int(p)
+                if 0 < n <= 65535:
+                    ports.append(n)
     services = [s.lower() for s in RE_SERVICE.findall(text)]
     files = RE_FILEPATH.findall(text)
     banners = [m.group(0).strip() for m in RE_BANNER.finditer(text)]
@@ -76,8 +87,14 @@ def extract_from_text(text: str) -> Dict[str, Any]:
         out["creds"]["passwords"].append(m.group(6))
         out["creds"]["pairs"].append(f"{m.group(3)}:{m.group(6)}")
     # very loose pairs (filter obvious garbage)
-    for u, p in RE_PAIR.findall(text):
+    for u, sep, p in RE_PAIR.findall(text):
         if len(u) <= 2 or len(p) <= 2:  # skip trivial
+            continue
+        if u.lower() in {"http", "https", "ftp", "ssh"} or p.startswith("//"):
+            continue
+        if u.isdigit() or p.lower() in {"tcp", "udp"}:
+            continue
+        if sep == "/" and re.fullmatch(r'\d+(?:\.\d+)+', p):
             continue
         out["creds"]["pairs"].append(f"{u}:{p}")
 
@@ -94,11 +111,16 @@ def extract_from_text(text: str) -> Dict[str, Any]:
     _extend_unique(out["errors"], errors)
 
     # high-level indicators (quick glance)
-    if ips: out["indicators"].append(f"ips:{len(ips)}")
-    if urls: out["indicators"].append(f"urls:{len(urls)}")
-    if cves: out["indicators"].append(f"cves:{len(cves)}")
-    if out["creds"]["pairs"]: out["indicators"].append(f"creds:{len(out['creds']['pairs'])}")
-    if ports: out["indicators"].append(f"ports:{len(ports)}")
+    if ips:
+        out["indicators"].append(f"ips:{len(ips)}")
+    if urls:
+        out["indicators"].append(f"urls:{len(urls)}")
+    if cves:
+        out["indicators"].append(f"cves:{len(cves)}")
+    if out["creds"]["pairs"]:
+        out["indicators"].append(f"creds:{len(out['creds']['pairs'])}")
+    if ports:
+        out["indicators"].append(f"ports:{len(ports)}")
 
     return out
 

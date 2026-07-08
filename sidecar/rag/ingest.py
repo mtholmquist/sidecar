@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import os
-import sys
 from .retriever import ingest_html, _db_path  # type: ignore
 
 
