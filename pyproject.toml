@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sidecar"
-version = "0.2.2"
+version = "1.1.0"
 description = "Sidecar: decoupled AI copilot for pentesting/CTFs"
 requires-python = ">=3.11"
 readme = "README.md"
