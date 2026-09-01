@@ -10,5 +10,5 @@ textual>=8.2.8
 openai>=2.44.0
 anthropic>=0.116.0
 scikit-learn>=1.9.0
-ruff>=0.15.20
+ruff>=0.16.3
 pytest>=9.1.1
